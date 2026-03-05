@@ -1,5 +1,5 @@
 from code.Background import Background
-from code.Const import WINDOW_WIDTH
+from code.Constants import WINDOW_WIDTH
 from code.Enemy import Enemy
 from code.Player import Player
 

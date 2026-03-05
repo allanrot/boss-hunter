@@ -1,6 +1,6 @@
 from pygame import K_SPACE
 
-from code.Const import WINDOW_WIDTH, PLAY_SHOT_DELAY
+from code.Constants import WINDOW_WIDTH, PLAY_SHOT_DELAY
 from code.Entity import Entity
 import pygame
 
@@ -56,6 +56,7 @@ class Player(Entity):
         self.vertical_speed = 0
         self.gravity = 0.5
         self.on_ground = True
+        self.space_pressed = False
 
     def update(self):
         if self.is_shooting:
@@ -79,9 +80,10 @@ class Player(Entity):
         if self.is_shooting:
             self.surf.blit(self.bow_frames[self.current_frame], (0, 0))
             self.shoot_timer += 1
-            if self.shoot_timer >= 10:
+            if self.shoot_timer >= 6:
                 self.is_shooting = False
                 self.shoot_timer = 0
+                self.current_frame = 0
 
     def move(self):
         keys = pygame.key.get_pressed()
@@ -101,10 +103,6 @@ class Player(Entity):
             self.on_ground = False
             self.is_jumping = True
             self.current_frame = 0
-        if keys[pygame.K_SPACE] and not self.is_shooting:
-            self.is_shooting = True
-            self.current_frame = 0
-            self.shoot_timer = 0
 
         self.vertical_speed += self.gravity
         self.rect.y += self.vertical_speed
@@ -118,9 +116,16 @@ class Player(Entity):
             self.on_ground = False
 
     def shoot(self):
-        self.shot_delay -= 1
+        keys = pygame.key.get_pressed()
 
-        if self.shot_delay == 0:
+        if keys[K_SPACE] and not self.space_pressed:
+            self.space_pressed = True
             self.shot_delay = PLAY_SHOT_DELAY
-            if pygame.key.get_pressed()[K_SPACE]:
-                return PlayerProjectile('player_projectile', (self.rect.centerx, self.rect.centery + 5))
+            self.is_shooting = True
+            self.current_frame = 0
+            self.shoot_timer = 0
+            return PlayerProjectile('player_projectile', (self.rect.centerx, self.rect.centery + 5))
+        elif not keys[K_SPACE]:
+            self.space_pressed = False
+
+        return None

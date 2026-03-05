@@ -13,18 +13,25 @@ ENTITY_SPEED = {
     'backgroundLevel1Layer5': 1.8
 }
 ENTITY_HEALTH = {
-    'player': 3,
+    'player': 6,
+    'enemy_0': 5,
+    'enemy_1': 3,
+    'player_projectile': 1,
+    'enemy_projectile': 1
+}
+ENTITY_DAMAGE = {
+    'player': 1,
     'enemy_0': 1,
     'enemy_1': 1,
     'player_projectile': 1,
     'enemy_projectile': 1
 }
 ENEMY_PROJECTILE_SPEED = 3
-ENEMY_PROJECTILE_DELAY = 50
+ENEMY_PROJECTILE_DELAY = 57
 ENEMY_SPAWN_TIME = 8000
 EVENT_ENEMY = pygame.USEREVENT + 1
 
-PLAY_SHOT_DELAY = 20
+PLAY_SHOT_DELAY = 40
 PLAY_PROJECTILE_SPEED = 5
 
 MENU_OPTIONS = (

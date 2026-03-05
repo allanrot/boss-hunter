@@ -2,7 +2,7 @@ import pygame.image
 from pygame import Surface, Rect
 from pygame.font import Font
 
-from code.Const import *
+from code.Constants import *
 
 
 class Menu:
@@ -10,8 +10,8 @@ class Menu:
         self.window = window
         self.surf = pygame.image.load('./assets/backgroundMenu.png').convert_alpha()
         self.rect = self.surf.get_rect(left=0, top=0)
-        pygame.mixer.music.load('./assets/menu.wav')
-        pygame.mixer.music.play(-1)
+        # pygame.mixer.music.load('./assets/musica_menu.wav')
+        # pygame.mixer.music.play(-1)
 
     def run(self):
         menu_option = 0

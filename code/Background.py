@@ -1,4 +1,4 @@
-from code.Const import WINDOW_WIDTH, ENTITY_SPEED
+from code.Constants import WINDOW_WIDTH, ENTITY_SPEED
 from code.Entity import Entity
 
 

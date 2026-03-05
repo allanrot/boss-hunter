@@ -1,4 +1,4 @@
-from code.Const import ENEMY_PROJECTILE_SPEED
+from code.Constants import ENEMY_PROJECTILE_SPEED
 from code.Entity import Entity
 
 

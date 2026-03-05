@@ -1,4 +1,4 @@
-from code.Const import PLAY_PROJECTILE_SPEED
+from code.Constants import PLAY_PROJECTILE_SPEED
 from code.Entity import Entity
 
 
