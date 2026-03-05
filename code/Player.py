@@ -1,6 +1,6 @@
 from pygame import K_SPACE
 
-from code.Constants import WINDOW_WIDTH, PLAY_SHOT_DELAY
+from code.Constants import WINDOW_WIDTH, PLAY_SHOT_DELAY, GRAVITY
 from code.Entity import Entity
 import pygame
 
@@ -16,20 +16,28 @@ class Player(Entity):
         self.shoot_sheet = pygame.image.load('./assets/player_shoot_walking.png').convert_alpha()
         self.bow_sheet = pygame.image.load('./assets/player_bow.png').convert_alpha()
 
+        self.score = 0
+
         self.walk_frames = []
         for i in range(6):
             frame = self.walk_sheet.subsurface(pygame.Rect(i * 42, 0, 42, 42))
-            self.walk_frames.append(frame)
+            frame_rect = frame.get_bounding_rect()
+            cropped_frame = frame.subsurface(frame_rect)
+            self.walk_frames.append(cropped_frame)
 
         self.jump_frames = []
         for i in range(6):
             frame = self.jump_sheet.subsurface(pygame.Rect(i * 42, 0, 42, 42))
-            self.jump_frames.append(frame)
+            frame_rect = frame.get_bounding_rect()
+            cropped_frame = frame.subsurface(frame_rect)
+            self.jump_frames.append(cropped_frame)
 
         self.shoot_frames = []
         for i in range(6):
             frame = self.shoot_sheet.subsurface(pygame.Rect(i * 42, 0, 42, 42))
-            self.shoot_frames.append(frame)
+            frame_rect = frame.get_bounding_rect()
+            cropped_frame = frame.subsurface(frame_rect)
+            self.shoot_frames.append(cropped_frame)
 
         self.bow_frames = []
         for i in range(6):
@@ -47,14 +55,16 @@ class Player(Entity):
         self.ground_y = 300
         self.left_wall = 0
         self.right_wall = WINDOW_WIDTH
-        position = (position[0], self.ground_y - 42)
+
+        self.original_height = 42
+
+        position = (position[0], self.ground_y - self.original_height)
 
         self.surf = self.walk_frames[0]
         self.rect = self.surf.get_rect(topleft=position)
 
         self.speed = 3
         self.vertical_speed = 0
-        self.gravity = 0.5
         self.on_ground = True
         self.space_pressed = False
 
@@ -78,7 +88,9 @@ class Player(Entity):
         self.surf = frames[self.current_frame].copy()
 
         if self.is_shooting:
-            self.surf.blit(self.bow_frames[self.current_frame], (0, 0))
+            bow_x = (self.surf.get_width() - self.bow_frames[self.current_frame].get_width()) + 15
+            bow_y = (self.surf.get_height() - self.bow_frames[self.current_frame].get_height())
+            self.surf.blit(self.bow_frames[self.current_frame], (bow_x, bow_y))
             self.shoot_timer += 1
             if self.shoot_timer >= 6:
                 self.is_shooting = False
@@ -104,7 +116,7 @@ class Player(Entity):
             self.is_jumping = True
             self.current_frame = 0
 
-        self.vertical_speed += self.gravity
+        self.vertical_speed += GRAVITY
         self.rect.y += self.vertical_speed
 
         if self.rect.bottom >= self.ground_y:
@@ -124,7 +136,7 @@ class Player(Entity):
             self.is_shooting = True
             self.current_frame = 0
             self.shoot_timer = 0
-            return PlayerProjectile('player_projectile', (self.rect.centerx, self.rect.centery + 5))
+            return PlayerProjectile('player_projectile', (self.rect.centerx, self.rect.centery))
         elif not keys[K_SPACE]:
             self.space_pressed = False
 

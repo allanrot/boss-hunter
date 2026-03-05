@@ -9,7 +9,7 @@ class Entity(ABC):
     def __init__(self, name: str, position: tuple, is_sprite: bool=False):
         self.name = name
         self.speed = 0
-        if not name.startswith('backgroundLevel1'):
+        if not name.startswith('background'):
             self.health = ENTITY_HEALTH[name]
             self.damage = ENTITY_DAMAGE[name]
         if not is_sprite:

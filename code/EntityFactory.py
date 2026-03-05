@@ -1,6 +1,7 @@
 from code.Background import Background
 from code.Constants import WINDOW_WIDTH
 from code.Enemy import Enemy
+from code.GameOver import GameOver
 from code.Player import Player
 
 
@@ -15,6 +16,8 @@ class EntityFactory:
                     list_bg.append(Background(f'{entity_name}Layer{i}', position))
                     list_bg.append(Background(f'{entity_name}Layer{i}', (WINDOW_WIDTH, 0)))
                 return list_bg
+            case 'gameOver':
+                return GameOver('backgroundGameOver', position)
             case 'player':
                 return Player('player', position)
             case 'enemy1':

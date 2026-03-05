@@ -12,10 +12,10 @@ class EntityMediator:
     def __verify_collision_window(entity: Entity):
         if isinstance(entity, (Enemy, EnemyProjectile)):
             if entity.rect.right <= 0:
-                entity.health = 0
+                entity.health = -1
         if isinstance(entity, PlayerProjectile):
             if entity.rect.left >= WINDOW_WIDTH:
-                entity.health = 0
+                entity.health = -1
 
     @staticmethod
     def __verify_entity_collision(first_entity: Entity, second_entity: Entity):
@@ -35,6 +35,9 @@ class EntityMediator:
             ):
                 first_entity.health -= second_entity.damage
                 second_entity.health -= first_entity.damage
+                if isinstance(first_entity, Enemy):
+                    if first_entity.health == 0:
+                        first_entity.killed = True
 
     @staticmethod
     def verify_collision(entity_list: list[Entity]):
@@ -46,7 +49,12 @@ class EntityMediator:
                     EntityMediator.__verify_entity_collision(first_entity, second_entity)
 
     @staticmethod
-    def verify_health(entity_list: list[Entity]):
+    def verify_health(self, entity_list: list[Entity]):
         for entity in entity_list:
             if isinstance(entity,(Player, Enemy, PlayerProjectile, EnemyProjectile)) and entity.health <= 0:
                 entity_list.remove(entity)
+                if isinstance(entity, Enemy) and entity.killed:
+                    player = next((entity for entity in entity_list if entity.name == 'player'), None)
+                    player.score += 1
+                if isinstance(entity, Player):
+                    self.game_over(self)

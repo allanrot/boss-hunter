@@ -1,4 +1,6 @@
-from code.Constants import ENEMY_PROJECTILE_DELAY
+import random
+
+from code.Constants import ENEMY_PROJECTILE_DELAY, GRAVITY
 from code.EnemyProjectile import EnemyProjectile
 from code.Entity import Entity
 import pygame
@@ -11,30 +13,42 @@ class Enemy(Entity):
         self.walk_sheet = pygame.image.load(f'./assets/{name}_walk.png').convert_alpha()
         self.attack_sheet = pygame.image.load(f'./assets/{name}_attack.png').convert_alpha()
 
+        self.killed = False
+
         self.walk_frames = []
         for i in range(6):
             frame = self.walk_sheet.subsurface(pygame.Rect(i * 96, 0, 96, 96))
-            self.walk_frames.append(frame)
+            frame_rect = frame.get_bounding_rect()
+            cropped_frame = frame.subsurface(frame_rect)
+            self.walk_frames.append(cropped_frame)
 
         self.attack_frames = []
         for i in range(6):
             frame = self.attack_sheet.subsurface(pygame.Rect(i * 96, 0, 96, 96))
-            self.attack_frames.append(frame)
+            frame_rect = frame.get_bounding_rect()
+            cropped_frame = frame.subsurface(frame_rect)
+            self.attack_frames.append(cropped_frame)
 
         self.current_frame = 0
         self.animation_timer = 0
         self.surf = self.walk_frames[0]
 
         self.ground_y = 300
-        position = (position[0], self.ground_y - 96)
+        position = (position[0], self.ground_y - self.surf.get_height())
         self.rect = self.surf.get_rect(topleft=position)
 
         self.vertical_speed = 0
-        self.gravity = 0.5
         self.on_ground = True
         self.speed = 1
         self.is_attacking = False
         self.shot_delay = ENEMY_PROJECTILE_DELAY
+
+        self.font = pygame.font.Font(None, 24)
+        self.text_surf = self.font.render(str(self.health), True, (255, 0, 0))
+        self.text_rect = self.text_surf.get_rect(center=(self.rect.centerx, self.rect.top - 10))
+
+        self.jump_timer = 0
+        self.jump_cooldown = random.randint(60, 180)
 
     def update(self):
         if self.is_attacking:
@@ -48,7 +62,7 @@ class Enemy(Entity):
             self.current_frame = (self.current_frame + 1) % len(frames)
             self.surf = frames[self.current_frame]
 
-        self.vertical_speed += self.gravity
+        self.vertical_speed += GRAVITY
         self.rect.y += self.vertical_speed
 
         if self.rect.bottom >= self.ground_y:
@@ -58,14 +72,25 @@ class Enemy(Entity):
         else:
             self.on_ground = False
 
+        self.jump_timer += 1
+        if self.jump_timer >= self.jump_cooldown and self.on_ground:
+            self.vertical_speed = -10
+            self.on_ground = False
+            self.jump_timer = 0
+            self.jump_cooldown = random.randint(60, 180)
+
+        self.text_surf = self.font.render(str(self.health), True, (255, 0, 0))
+        self.text_rect.center = (self.rect.centerx + 5, self.rect.top - 10)
+
     def move(self):
         self.rect.x -= self.speed
+        self.text_rect.center = (self.rect.centerx, self.rect.top - 10)
 
     def shoot(self):
         self.is_attacking = True
         self.shot_delay -= 1
         if self.shot_delay == 0:
             self.shot_delay = ENEMY_PROJECTILE_DELAY
-            shot_axis_x = self.rect.centerx + 10 if self.name == 'enemy_0' else self.rect.centerx + 15
-            shot_axis_y = self.rect.centery - 5 if self.name == 'enemy_0' else self.rect.centery + 20
+            shot_axis_x = self.rect.left - 10
+            shot_axis_y = self.rect.centery - 20 if self.name == 'enemy_0' else self.rect.centery - 10
             return EnemyProjectile('enemy_projectile', (shot_axis_x, shot_axis_y))
