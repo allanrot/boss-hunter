@@ -6,7 +6,7 @@ from code.Entity import Entity
 import pygame
 
 
-class Enemy(Entity):
+class Boss(Entity):
     def __init__(self, name: str, position: tuple):
         super().__init__(name, position, True)
 
@@ -36,7 +36,7 @@ class Enemy(Entity):
         self.killed = False
         self.vertical_speed = 0
         self.on_ground = True
-        self.speed = 1
+        self.speed = 0.6
         self.is_attacking = False
         self.shot_delay = ENEMY_PROJECTILE_DELAY
 
@@ -88,6 +88,6 @@ class Enemy(Entity):
         self.shot_delay -= 1
         if self.shot_delay == 0:
             self.shot_delay = ENEMY_PROJECTILE_DELAY
-            shot_axis_x = self.rect.left - 10
-            shot_axis_y = self.rect.centery - 20 if self.name == 'enemy_0' else self.rect.centery - 10
-            return EnemyProjectile('enemy_projectile', (shot_axis_x, shot_axis_y))
+            shot_axis_x = self.rect.left
+            shot_axis_y = self.rect.centery
+            return EnemyProjectile('first_boss_projectile', (shot_axis_x, shot_axis_y))

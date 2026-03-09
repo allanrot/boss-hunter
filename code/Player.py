@@ -1,6 +1,6 @@
 from pygame import K_SPACE
 
-from code.Constants import WINDOW_WIDTH, PLAY_SHOT_DELAY, GRAVITY
+from code.Constants import WINDOW_WIDTH, PLAY_SHOT_DELAY, GRAVITY, GROUND_Y
 from code.Entity import Entity
 import pygame
 
@@ -15,8 +15,7 @@ class Player(Entity):
         self.jump_sheet = pygame.image.load('./assets/player_jump.png').convert_alpha()
         self.shoot_sheet = pygame.image.load('./assets/player_shoot_walking.png').convert_alpha()
         self.bow_sheet = pygame.image.load('./assets/player_bow.png').convert_alpha()
-
-        self.score = 0
+        self.death_sheet = pygame.image.load('./assets/player_death.png').convert_alpha()
 
         self.walk_frames = []
         for i in range(6):
@@ -44,21 +43,29 @@ class Player(Entity):
             frame = self.bow_sheet.subsurface(pygame.Rect(i * 42, 0, 42, 42))
             self.bow_frames.append(frame)
 
+        self.death_frames = []
+        for i in range(6):
+            frame = self.death_sheet.subsurface(pygame.Rect(i * 42, 0, 42, 42))
+            frame_rect = frame.get_bounding_rect()
+            cropped_frame = frame.subsurface(frame_rect)
+            self.death_frames.append(cropped_frame)
+
+        self.score = 0
         self.current_frame = 0
         self.animation_timer = 0
         self.is_jumping = False
         self.is_walking = True
         self.is_shooting = False
+        self.is_dying = False
         self.shoot_timer = 0
         self.shot_delay = PLAY_SHOT_DELAY
 
-        self.ground_y = 300
         self.left_wall = 0
         self.right_wall = WINDOW_WIDTH
 
         self.original_height = 42
 
-        position = (position[0], self.ground_y - self.original_height)
+        position = (position[0], GROUND_Y - self.original_height)
 
         self.surf = self.walk_frames[0]
         self.rect = self.surf.get_rect(topleft=position)
@@ -71,6 +78,8 @@ class Player(Entity):
     def update(self):
         if self.is_shooting:
             frames = self.shoot_frames
+        elif self.is_dying:
+            frames = self.death_frames
         elif self.is_jumping:
             frames = self.jump_frames
         elif self.is_walking:
@@ -119,8 +128,8 @@ class Player(Entity):
         self.vertical_speed += GRAVITY
         self.rect.y += self.vertical_speed
 
-        if self.rect.bottom >= self.ground_y:
-            self.rect.bottom = self.ground_y
+        if self.rect.bottom >= GROUND_Y:
+            self.rect.bottom = GROUND_Y
             self.vertical_speed = 0
             self.on_ground = True
             self.is_jumping = False

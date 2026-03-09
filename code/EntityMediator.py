@@ -1,3 +1,6 @@
+import pygame
+
+from code.Boss import Boss
 from code.Constants import WINDOW_WIDTH
 from code.Enemy import Enemy
 from code.EnemyProjectile import EnemyProjectile
@@ -10,7 +13,7 @@ class EntityMediator:
 
     @staticmethod
     def __verify_collision_window(entity: Entity):
-        if isinstance(entity, (Enemy, EnemyProjectile)):
+        if isinstance(entity, (Boss, Enemy, EnemyProjectile)):
             if entity.rect.right <= 0:
                 entity.health = -1
         if isinstance(entity, PlayerProjectile):
@@ -21,7 +24,7 @@ class EntityMediator:
     def __verify_entity_collision(first_entity: Entity, second_entity: Entity):
         valid_interaction = False
 
-        if isinstance(first_entity, Enemy) and isinstance(second_entity, PlayerProjectile):
+        if isinstance(first_entity, (Enemy, Boss)) and isinstance(second_entity, PlayerProjectile):
             valid_interaction = True
         elif isinstance(first_entity, Player) and isinstance(second_entity, EnemyProjectile):
             valid_interaction = True
@@ -35,7 +38,7 @@ class EntityMediator:
             ):
                 first_entity.health -= second_entity.damage
                 second_entity.health -= first_entity.damage
-                if isinstance(first_entity, Enemy):
+                if isinstance(first_entity, (Enemy, Boss)):
                     if first_entity.health == 0:
                         first_entity.killed = True
 
@@ -49,12 +52,16 @@ class EntityMediator:
                     EntityMediator.__verify_entity_collision(first_entity, second_entity)
 
     @staticmethod
-    def verify_health(self, entity_list: list[Entity]):
+    def verify_health(entity_list: list[Entity]):
         for entity in entity_list:
-            if isinstance(entity,(Player, Enemy, PlayerProjectile, EnemyProjectile)) and entity.health <= 0:
-                entity_list.remove(entity)
-                if isinstance(entity, Enemy) and entity.killed:
+            if isinstance(entity,(Player, Enemy, Boss, PlayerProjectile, EnemyProjectile)) and entity.health <= 0:
+                if isinstance(entity, (PlayerProjectile, EnemyProjectile)):
+                    entity_list.remove(entity)
+                if isinstance(entity, (Enemy, Boss)) and entity.health == -1:
+                    entity_list.remove(entity)
+                if isinstance(entity, (Enemy, Boss)) and entity.killed:
                     player = next((entity for entity in entity_list if entity.name == 'player'), None)
-                    player.score += 1
+                    player.score += 3 if isinstance(entity, Boss) else 1
+                    entity_list.remove(entity)
                 if isinstance(entity, Player):
-                    self.game_over(self)
+                    entity.is_dying = True
