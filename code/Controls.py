@@ -21,9 +21,9 @@ class Controls:
 
             for i in range(len(CONTROLS_KEYBOARD)):
                 self.menu_text(40, CONTROLS_KEYBOARD[i], COLOR_TEXT_SELECTED_OPTION_MENU,
-                               (WINDOW_WIDTH / 4, 100 + 50 * i))
+                               (WINDOW_WIDTH / 4, 100 + 35 * i))
                 self.menu_text(40, CONTROLS_GAME[i], COLOR_TEXT_SELECTED_OPTION_MENU,
-                               (WINDOW_WIDTH - WINDOW_WIDTH / 4, 100 + 50 * i))
+                               (WINDOW_WIDTH - WINDOW_WIDTH / 4, 100 + 35 * i))
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

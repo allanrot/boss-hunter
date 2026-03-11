@@ -7,12 +7,16 @@ CONTROLS_KEYBOARD = (
     "Space",
     "Left arrow",
     "Right arrow",
+    "Up arrow",
+    "Enter",
     "Backspace"
 )
 CONTROLS_GAME = (
     "Shoot",
     "Move back",
     "Move forward",
+    "Jump",
+    "Action",
     "Back"
 )
 
